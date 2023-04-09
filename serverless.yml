@@ -2,7 +2,11 @@ service: talent-pool
 frameworkVersion: '3'
 
 custom:
-  tableName: 'users-table-${sls:stage}'
+  tableName: 'talents-table-${sls:stage}'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
 
 provider:
   name: aws
@@ -19,26 +23,67 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [ UsersTable, Arn ]
+            - Fn::GetAtt: [ TalentsTable, Arn ]
   environment:
-    USERS_TABLE: ${self:custom.tableName}
+    TALENTS_TABLE: ${self:custom.tableName}
 
 functions:
   api:
-    handler: index.handler
+    handler: src/server.handler
     events:
       - httpApi: '*'
 
 resources:
   Resources:
-    UsersTable:
+    TalentsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        AttributeDefinitions:
-          - AttributeName: userId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: userId
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: "PK"
+            AttributeType: "S"
+          - AttributeName: "SK"
+            AttributeType: "S"
+          - AttributeName: "position"
+            AttributeType: "S"
+          - AttributeName: "salary"
+            AttributeType: "N"
+          - AttributeName: "yearsExperience"
+            AttributeType: "N"
+          - AttributeName: "skills"
+            AttributeType: "S"
+          - AttributeName: "region"
+            AttributeType: "S"
+          - AttributeName: "availability"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "PK"
+            KeyType: "HASH"
+          - AttributeName: "SK"
+            KeyType: "RANGE"
+        BillingMode: "PAY_PER_REQUEST"
+        GlobalSecondaryIndexes:
+          - IndexName: "PositionSalaryIndex"
+            KeySchema:
+              - AttributeName: "position"
+                KeyType: "HASH"
+              - AttributeName: "salary"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+          - IndexName: "YearsExperienceSkillsIndex"
+            KeySchema:
+              - AttributeName: "yearsExperience"
+                KeyType: "HASH"
+              - AttributeName: "skills"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+          - IndexName: "RegionAvailabilityIndex"
+            KeySchema:
+              - AttributeName: "region"
+                KeyType: "HASH"
+              - AttributeName: "availability"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
