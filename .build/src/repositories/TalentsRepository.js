@@ -1,4 +1,10 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,55 +42,41 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TalentsController = void 0;
-var TalentAlreadyExists_1 = require("../errors/TalentAlreadyExists");
-var TalentsController = /** @class */ (function () {
-    function TalentsController(talentsService) {
-        this.talentsService = talentsService;
-        talentsService = this.talentsService;
+exports.TalentsRepository = void 0;
+var client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
+var lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
+var tsyringe_1 = require("tsyringe");
+var client = new client_dynamodb_1.DynamoDB({ region: 'us-east-1' }); //TODO: Remover essa dependencia daqui
+var TalentsRepository = exports.TalentsRepository = /** @class */ (function () {
+    function TalentsRepository() {
     }
-    TalentsController.prototype.index = function (req, res) {
+    TalentsRepository.prototype.index = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                res.send('Hello World!');
-                return [2 /*return*/];
+                return [2 /*return*/, 'Hello World!'];
             });
         });
     };
-    TalentsController.prototype.show = function (req, res) {
+    TalentsRepository.prototype.show = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                res.send('Hello World!');
-                return [2 /*return*/];
+                return [2 /*return*/, 'Hello World!'];
             });
         });
     };
-    TalentsController.prototype.store = function (req, res) {
+    TalentsRepository.prototype.persist = function (params) {
         return __awaiter(this, void 0, void 0, function () {
-            var params, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.talentsService.getParams(req.body)];
-                    case 1:
-                        params = _a.sent();
-                        return [4 /*yield*/, this.talentsService.registerTalent(params)];
-                    case 2:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_1 = _a.sent();
-                        if (err_1 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
-                            return [2 /*return*/, res.status(409).send({ error: err_1.message })];
-                        }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/, res.status(201).send()];
+                    case 0: return [4 /*yield*/, client.send(new lib_dynamodb_1.PutCommand(params))];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    return TalentsController;
+    TalentsRepository = __decorate([
+        (0, tsyringe_1.injectable)()
+    ], TalentsRepository);
+    return TalentsRepository;
 }());
-exports.TalentsController = TalentsController;
-//# sourceMappingURL=TalentsController.js.map
+//# sourceMappingURL=TalentsRepository.js.map

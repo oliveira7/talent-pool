@@ -1,60 +1,32 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
-import { PutCommand } from '@aws-sdk/lib-dynamodb';
-import { Request, Response, NextFunction } from 'express';
-import { v4 as uuid } from 'uuid';
+import { Request, Response } from 'express';
+import { TalentAlreadyExists } from '../errors/TalentAlreadyExists';
+import { TalentsService } from '../../services/TalentsService';
+import { ITalentsController } from './ITalentsController';
 
-const client = new DynamoDB({ region: 'us-east-1' });
+export class TalentsController implements ITalentsController{
+  constructor(private talentsService: TalentsService){
+    talentsService = this.talentsService;
+  }
 
-class TalentsController {
-  public async index(req: Request, res: Response, next: NextFunction) {
+  async index(req: Request, res: Response) {
     res.send('Hello World!');
   }
 
-  public async show(req: Request, res: Response, next: NextFunction) {
+  async show(req: Request, res: Response) {
     res.send('Hello World!');
   }
-  
-  public async store(req: Request, res: Response, next: NextFunction) {
-    const { 
-      position, 
-      salary, 
-      yearsExperience, 
-      skills, 
-      region, 
-      availability, 
-      email, 
-      name, 
-      education, 
-      languages, 
-      contact,
-      occupation
-    } = req.body;
-  
-    const params = {
-      TableName: 'talents-table-dev',
-      Item: {
-        PK: `TALENT#${uuid()}`,
-        SK: 'PROFILE#INFO',
-        position: position,
-        salary: salary,
-        yearsExperience: yearsExperience,
-        skills: JSON.stringify(skills),
-        region: region,
-        availability: availability,
-        email: email,
-        name: name,
-        education: education,
-        languages: JSON.stringify(languages),
-        contact: contact,
-        occupation: occupation,
-        createdAt: new Date().toISOString()
+
+  async store(req: Request, res: Response) {
+    try {
+      const params = await this.talentsService.getParams(req.body);
+
+      await this.talentsService.registerTalent(params);
+    }catch(err) {
+      if(err instanceof TalentAlreadyExists) {
+        return res.status(409).send({ error: err.message });
       }
-    };
-  
-    const resource = await client.send(new PutCommand(params));
-  
-    return res.send({ resource });
+    }
+
+    return res.status(201).send();
   }
 }
-
-export default new TalentsController();

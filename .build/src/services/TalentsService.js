@@ -36,55 +36,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TalentsController = void 0;
-var TalentAlreadyExists_1 = require("../errors/TalentAlreadyExists");
-var TalentsController = /** @class */ (function () {
-    function TalentsController(talentsService) {
-        this.talentsService = talentsService;
-        talentsService = this.talentsService;
+exports.TalentsService = void 0;
+var uuid_1 = require("uuid");
+var TalentsService = /** @class */ (function () {
+    function TalentsService(talentsRepository) {
+        this.talentsRepository = talentsRepository;
+        talentsRepository = this.talentsRepository;
     }
-    TalentsController.prototype.index = function (req, res) {
+    TalentsService.prototype.getParams = function (body) {
+        var position = body.position, salary = body.salary, yearsExperience = body.yearsExperience, skills = body.skills, region = body.region, availability = body.availability, email = body.email, name = body.name, education = body.education, languages = body.languages, contact = body.contact, occupation = body.occupation;
+        return {
+            TableName: 'talents-table-dev',
+            Item: {
+                PK: "TALENT#".concat((0, uuid_1.v4)()),
+                SK: 'PROFILE#INFO',
+                position: position,
+                salary: parseInt(salary),
+                yearsExperience: parseInt(yearsExperience),
+                skills: JSON.stringify(skills),
+                region: region,
+                availability: availability,
+                email: email,
+                name: name,
+                education: education,
+                languages: JSON.stringify(languages),
+                contact: contact,
+                occupation: occupation,
+                createdAt: new Date().toISOString()
+            }
+        };
+    };
+    TalentsService.prototype.registerTalent = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                res.send('Hello World!');
-                return [2 /*return*/];
+                // const talent = await this.talentsRepository.findTalentByEmail(params.email);
+                // if(talent) {
+                //   throw new TalentAlreadyExists();
+                // }
+                return [2 /*return*/, this.talentsRepository.persist(params)];
             });
         });
     };
-    TalentsController.prototype.show = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                res.send('Hello World!');
-                return [2 /*return*/];
-            });
-        });
-    };
-    TalentsController.prototype.store = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var params, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.talentsService.getParams(req.body)];
-                    case 1:
-                        params = _a.sent();
-                        return [4 /*yield*/, this.talentsService.registerTalent(params)];
-                    case 2:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_1 = _a.sent();
-                        if (err_1 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
-                            return [2 /*return*/, res.status(409).send({ error: err_1.message })];
-                        }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/, res.status(201).send()];
-                }
-            });
-        });
-    };
-    return TalentsController;
+    return TalentsService;
 }());
-exports.TalentsController = TalentsController;
-//# sourceMappingURL=TalentsController.js.map
+exports.TalentsService = TalentsService;
+//# sourceMappingURL=TalentsService.js.map
