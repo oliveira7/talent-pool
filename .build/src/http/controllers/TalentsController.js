@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TalentsController = void 0;
 var TalentAlreadyExists_1 = require("../errors/TalentAlreadyExists");
+var zod_1 = require("zod");
 var TalentsController = /** @class */ (function () {
     function TalentsController(talentsService) {
         this.talentsService = talentsService;
@@ -59,12 +60,27 @@ var TalentsController = /** @class */ (function () {
     };
     TalentsController.prototype.store = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var params, err_1;
+            var talentSchema, body, params, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 3, , 4]);
-                        return [4 /*yield*/, this.talentsService.getParams(req.body)];
+                        talentSchema = zod_1.z.object({
+                            position: zod_1.z.enum(['fullstack', 'frontend', 'backend']),
+                            salary: zod_1.z.number(),
+                            yearsExperience: zod_1.z.number(),
+                            technologies: zod_1.z.string(),
+                            region: zod_1.z.string(),
+                            availability: zod_1.z.enum(['fulltime', 'parttime', 'freelance']),
+                            name: zod_1.z.string(),
+                            email: zod_1.z.string().email(),
+                            education: zod_1.z.string(),
+                            languages: zod_1.z.string(),
+                            contact: zod_1.z.string().regex(/^(\d{2})(\d{2})9(\d{4})(\d{4})$/),
+                            occupation: zod_1.z.enum(['student', 'professional'])
+                        });
+                        body = talentSchema.parse(req.body);
+                        return [4 /*yield*/, this.talentsService.getParams(body)];
                     case 1:
                         params = _a.sent();
                         return [4 /*yield*/, this.talentsService.create(params)];
@@ -76,7 +92,13 @@ var TalentsController = /** @class */ (function () {
                         if (err_1 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
                             return [2 /*return*/, res.status(409).send({ message: err_1.message })];
                         }
-                        return [2 /*return*/, res.status(500).send({ message: err_1.message })];
+                        if (err_1 instanceof zod_1.ZodError) {
+                            return [2 /*return*/, res.status(400).json({
+                                    message: 'Validation error.',
+                                    error: err_1.format()
+                                })];
+                        }
+                        return [3 /*break*/, 4];
                     case 4: return [2 /*return*/, res.status(201).send({ message: 'Talent created successfully!' })];
                 }
             });
