@@ -41,39 +41,37 @@ var uuid_1 = require("uuid");
 var TalentsService = /** @class */ (function () {
     function TalentsService(talentsRepository) {
         this.talentsRepository = talentsRepository;
-        talentsRepository = this.talentsRepository;
+        this.talentsRepository = talentsRepository;
     }
     TalentsService.prototype.getParams = function (body) {
-        var position = body.position, salary = body.salary, yearsExperience = body.yearsExperience, skills = body.skills, region = body.region, availability = body.availability, email = body.email, name = body.name, education = body.education, languages = body.languages, contact = body.contact, occupation = body.occupation;
+        var position = body.position, salary = body.salary, yearsExperience = body.yearsExperience, technologies = body.technologies, region = body.region, availability = body.availability, email = body.email, name = body.name, education = body.education, languages = body.languages, contact = body.contact, occupation = body.occupation;
         return {
-            TableName: 'talents-table-dev',
-            Item: {
-                PK: "TALENT#".concat((0, uuid_1.v4)()),
-                SK: 'PROFILE#INFO',
-                position: position,
-                salary: parseInt(salary),
-                yearsExperience: parseInt(yearsExperience),
-                skills: JSON.stringify(skills),
-                region: region,
-                availability: availability,
-                email: email,
-                name: name,
-                education: education,
-                languages: JSON.stringify(languages),
-                contact: contact,
-                occupation: occupation,
-                createdAt: new Date().toISOString()
-            }
+            PK: "TALENT#".concat((0, uuid_1.v4)()),
+            SK: 'PROFILE#INFO',
+            position: position,
+            salary: parseInt(salary),
+            yearsExperience: parseInt(yearsExperience),
+            technologies: JSON.stringify(technologies),
+            region: region,
+            availability: availability,
+            name: name,
+            email: email,
+            education: education,
+            languages: JSON.stringify(languages),
+            contact: contact,
+            occupation: occupation,
+            createdAt: new Date().toISOString()
         };
     };
-    TalentsService.prototype.registerTalent = function (params) {
+    TalentsService.prototype.create = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                // const talent = await this.talentsRepository.findTalentByEmail(params.email);
-                // if(talent) {
-                //   throw new TalentAlreadyExists();
-                // }
-                return [2 /*return*/, this.talentsRepository.persist(params)];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.talentsRepository.persist(params)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };

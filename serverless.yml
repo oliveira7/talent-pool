@@ -50,11 +50,13 @@ resources:
             AttributeType: "N"
           - AttributeName: "occupation"
             AttributeType: "S"
-          - AttributeName: "skills"
+          - AttributeName: "technologies"
             AttributeType: "S"
           - AttributeName: "region"
             AttributeType: "S"
           - AttributeName: "availability"
+            AttributeType: "S"
+          - AttributeName: "email"
             AttributeType: "S"
         KeySchema:
           - AttributeName: "PK"
@@ -71,11 +73,11 @@ resources:
                 KeyType: "RANGE"
             Projection:
               ProjectionType: "ALL"
-          - IndexName: "OccupationSkillsIndex"
+          - IndexName: "OccupationtechnologiesIndex"
             KeySchema:
               - AttributeName: "occupation"
                 KeyType: "HASH"
-              - AttributeName: "skills"
+              - AttributeName: "technologies"
                 KeyType: "RANGE"
             Projection:
               ProjectionType: "ALL"
@@ -84,6 +86,14 @@ resources:
               - AttributeName: "region"
                 KeyType: "HASH"
               - AttributeName: "availability"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+          - IndexName: "EmailIndex"
+            KeySchema:
+              - AttributeName: "email"
+                KeyType: "HASH"
+              - AttributeName: "PK"
                 KeyType: "RANGE"
             Projection:
               ProjectionType: "ALL"

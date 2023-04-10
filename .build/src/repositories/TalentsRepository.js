@@ -1,10 +1,4 @@
 "use strict";
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -45,38 +39,88 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TalentsRepository = void 0;
 var client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 var lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
-var tsyringe_1 = require("tsyringe");
-var client = new client_dynamodb_1.DynamoDB({ region: 'us-east-1' }); //TODO: Remover essa dependencia daqui
-var TalentsRepository = exports.TalentsRepository = /** @class */ (function () {
+var DynamoDBClient_1 = require("../dynamodb/DynamoDBClient");
+var env_1 = require("../env");
+var TalentAlreadyExists_1 = require("../http/errors/TalentAlreadyExists");
+var TalentsRepository = /** @class */ (function () {
     function TalentsRepository() {
+        this.client = new DynamoDBClient_1.DynamoDBClient().getClient();
     }
-    TalentsRepository.prototype.index = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, 'Hello World!'];
-            });
-        });
-    };
-    TalentsRepository.prototype.show = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, 'Hello World!'];
-            });
-        });
-    };
     TalentsRepository.prototype.persist = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, client.send(new lib_dynamodb_1.PutCommand(params))];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 0: return [4 /*yield*/, this.verifyByEmail(params.email)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.client.send(new lib_dynamodb_1.PutCommand({
+                                TableName: env_1.env.TABLE_NAME,
+                                Item: params,
+                                ConditionExpression: 'attribute_not_exists(email)',
+                            }))];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    TalentsRepository = __decorate([
-        (0, tsyringe_1.injectable)()
-    ], TalentsRepository);
+    TalentsRepository.prototype.verifyByEmail = function (email) {
+        return __awaiter(this, void 0, void 0, function () {
+            var resource;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.client.send(new client_dynamodb_1.ScanCommand({
+                            TableName: env_1.env.TABLE_NAME,
+                            IndexName: 'EmailIndex',
+                            FilterExpression: 'email = :email',
+                            ExpressionAttributeValues: {
+                                ':email': { S: email },
+                            },
+                            Select: 'COUNT',
+                        }))];
+                    case 1:
+                        resource = _a.sent();
+                        if (resource.Count > 0) {
+                            throw new TalentAlreadyExists_1.TalentAlreadyExists();
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    TalentsRepository.prototype.paginate = function (pageSize) {
+        return __awaiter(this, void 0, void 0, function () {
+            var client, results, lastEvaluatedKey, params, _a, Items, LastEvaluatedKey;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        client = new DynamoDBClient_1.DynamoDBClient().getClient();
+                        results = [];
+                        _b.label = 1;
+                    case 1:
+                        params = {
+                            TableName: 'talents-table-dev',
+                            Limit: pageSize,
+                            ExclusiveStartKey: lastEvaluatedKey,
+                        };
+                        return [4 /*yield*/, client.send(new lib_dynamodb_1.QueryCommand(params))];
+                    case 2:
+                        _a = _b.sent(), Items = _a.Items, LastEvaluatedKey = _a.LastEvaluatedKey;
+                        if (Items) {
+                            results = results.concat(Items);
+                        }
+                        lastEvaluatedKey = LastEvaluatedKey;
+                        _b.label = 3;
+                    case 3:
+                        if (lastEvaluatedKey) return [3 /*break*/, 1];
+                        _b.label = 4;
+                    case 4: return [2 /*return*/, results];
+                }
+            });
+        });
+    };
     return TalentsRepository;
 }());
+exports.TalentsRepository = TalentsRepository;
 //# sourceMappingURL=TalentsRepository.js.map

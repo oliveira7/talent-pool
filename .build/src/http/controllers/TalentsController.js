@@ -41,20 +41,18 @@ var TalentAlreadyExists_1 = require("../errors/TalentAlreadyExists");
 var TalentsController = /** @class */ (function () {
     function TalentsController(talentsService) {
         this.talentsService = talentsService;
-        talentsService = this.talentsService;
+        this.talentsService = talentsService;
     }
     TalentsController.prototype.index = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                res.send('Hello World!');
-                return [2 /*return*/];
-            });
-        });
-    };
-    TalentsController.prototype.show = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                res.send('Hello World!');
+                try {
+                    //const talents = await this.talentsService.getTalents(10);
+                    return [2 /*return*/, res.status(200).send('talents')];
+                }
+                catch (err) {
+                    return [2 /*return*/, res.status(500).send({ error: err.message })];
+                }
                 return [2 /*return*/];
             });
         });
@@ -69,17 +67,17 @@ var TalentsController = /** @class */ (function () {
                         return [4 /*yield*/, this.talentsService.getParams(req.body)];
                     case 1:
                         params = _a.sent();
-                        return [4 /*yield*/, this.talentsService.registerTalent(params)];
+                        return [4 /*yield*/, this.talentsService.create(params)];
                     case 2:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 3:
                         err_1 = _a.sent();
                         if (err_1 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
-                            return [2 /*return*/, res.status(409).send({ error: err_1.message })];
+                            return [2 /*return*/, res.status(409).send({ message: err_1.message })];
                         }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/, res.status(201).send()];
+                        return [2 /*return*/, res.status(500).send({ message: err_1.message })];
+                    case 4: return [2 /*return*/, res.status(201).send({ message: 'Talent created successfully!' })];
                 }
             });
         });

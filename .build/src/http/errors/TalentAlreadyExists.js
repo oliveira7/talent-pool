@@ -19,7 +19,7 @@ exports.TalentAlreadyExists = void 0;
 var TalentAlreadyExists = /** @class */ (function (_super) {
     __extends(TalentAlreadyExists, _super);
     function TalentAlreadyExists() {
-        return _super.call(this, 'E-mail already exists') || this;
+        return _super.call(this, 'Talent already exists.') || this;
     }
     return TalentAlreadyExists;
 }(Error));
