@@ -48,8 +48,8 @@ resources:
             AttributeType: "S"
           - AttributeName: "salary"
             AttributeType: "N"
-          - AttributeName: "yearsExperience"
-            AttributeType: "N"
+          - AttributeName: "occupation"
+            AttributeType: "S"
           - AttributeName: "skills"
             AttributeType: "S"
           - AttributeName: "region"
@@ -71,9 +71,9 @@ resources:
                 KeyType: "RANGE"
             Projection:
               ProjectionType: "ALL"
-          - IndexName: "YearsExperienceSkillsIndex"
+          - IndexName: "OccupationSkillsIndex"
             KeySchema:
-              - AttributeName: "yearsExperience"
+              - AttributeName: "occupation"
                 KeyType: "HASH"
               - AttributeName: "skills"
                 KeyType: "RANGE"
