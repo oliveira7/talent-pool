@@ -40,12 +40,38 @@ exports.TalentsRepository = void 0;
 var client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 var lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 var DynamoDBClient_1 = require("../dynamodb/DynamoDBClient");
-var env_1 = require("../env");
 var TalentAlreadyExists_1 = require("../http/errors/TalentAlreadyExists");
+var env_1 = require("../env");
 var TalentsRepository = /** @class */ (function () {
     function TalentsRepository() {
         this.client = new DynamoDBClient_1.DynamoDBClient().getClient();
     }
+    TalentsRepository.prototype.retrieveAll = function (queries) {
+        return __awaiter(this, void 0, void 0, function () {
+            var position, salary, params;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        position = queries.position, salary = queries.salary;
+                        params = {
+                            TableName: env_1.env.TABLE_NAME,
+                            IndexName: 'PositionSalaryIndex',
+                            KeyConditionExpression: '#position = :position AND salary > :salary',
+                            ExpressionAttributeNames: {
+                                '#position': 'position',
+                            },
+                            ExpressionAttributeValues: {
+                                ':position': { S: position },
+                                ':salary': { N: salary }
+                            },
+                            Select: 'ALL_ATTRIBUTES'
+                        };
+                        return [4 /*yield*/, this.client.send(new client_dynamodb_1.QueryCommand(params))];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     TalentsRepository.prototype.persist = function (params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -55,8 +81,7 @@ var TalentsRepository = /** @class */ (function () {
                         _a.sent();
                         return [4 /*yield*/, this.client.send(new lib_dynamodb_1.PutCommand({
                                 TableName: env_1.env.TABLE_NAME,
-                                Item: params,
-                                ConditionExpression: 'attribute_not_exists(email)',
+                                Item: params
                             }))];
                     case 2:
                         _a.sent();
@@ -85,37 +110,6 @@ var TalentsRepository = /** @class */ (function () {
                             throw new TalentAlreadyExists_1.TalentAlreadyExists();
                         }
                         return [2 /*return*/];
-                }
-            });
-        });
-    };
-    TalentsRepository.prototype.paginate = function (pageSize) {
-        return __awaiter(this, void 0, void 0, function () {
-            var client, results, lastEvaluatedKey, params, _a, Items, LastEvaluatedKey;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        client = new DynamoDBClient_1.DynamoDBClient().getClient();
-                        results = [];
-                        _b.label = 1;
-                    case 1:
-                        params = {
-                            TableName: 'talents-table-dev',
-                            Limit: pageSize,
-                            ExclusiveStartKey: lastEvaluatedKey,
-                        };
-                        return [4 /*yield*/, client.send(new lib_dynamodb_1.QueryCommand(params))];
-                    case 2:
-                        _a = _b.sent(), Items = _a.Items, LastEvaluatedKey = _a.LastEvaluatedKey;
-                        if (Items) {
-                            results = results.concat(Items);
-                        }
-                        lastEvaluatedKey = LastEvaluatedKey;
-                        _b.label = 3;
-                    case 3:
-                        if (lastEvaluatedKey) return [3 /*break*/, 1];
-                        _b.label = 4;
-                    case 4: return [2 /*return*/, results];
                 }
             });
         });

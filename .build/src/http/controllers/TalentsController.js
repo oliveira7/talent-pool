@@ -46,60 +46,63 @@ var TalentsController = /** @class */ (function () {
     }
     TalentsController.prototype.index = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
+            var talents, err_1;
             return __generator(this, function (_a) {
-                try {
-                    //const talents = await this.talentsService.getTalents(10);
-                    return [2 /*return*/, res.status(200).send('talents')];
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.talentsService.index(req.query)];
+                    case 1:
+                        talents = _a.sent();
+                        return [2 /*return*/, res.status(200).send({ data: talents })];
+                    case 2:
+                        err_1 = _a.sent();
+                        return [2 /*return*/, res.status(500).send({ error: err_1.message })];
+                    case 3: return [2 /*return*/];
                 }
-                catch (err) {
-                    return [2 /*return*/, res.status(500).send({ error: err.message })];
-                }
-                return [2 /*return*/];
             });
         });
     };
     TalentsController.prototype.store = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var talentSchema, body, params, err_1;
+            var talentSchema, params, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _a.trys.push([0, 2, , 3]);
                         talentSchema = zod_1.z.object({
                             position: zod_1.z.enum(['fullstack', 'frontend', 'backend']),
                             salary: zod_1.z.number(),
                             yearsExperience: zod_1.z.number(),
-                            technologies: zod_1.z.string(),
+                            technologies: zod_1.z.array(zod_1.z.string()),
                             region: zod_1.z.string(),
                             availability: zod_1.z.enum(['fulltime', 'parttime', 'freelance']),
                             name: zod_1.z.string(),
                             email: zod_1.z.string().email(),
                             education: zod_1.z.string(),
-                            languages: zod_1.z.string(),
+                            languages: zod_1.z.array(zod_1.z.string()),
                             contact: zod_1.z.string().regex(/^(\d{2})(\d{2})9(\d{4})(\d{4})$/),
-                            occupation: zod_1.z.enum(['student', 'professional'])
+                            occupation: zod_1.z.string()
                         });
-                        body = talentSchema.parse(req.body);
-                        return [4 /*yield*/, this.talentsService.getParams(body)];
-                    case 1:
-                        params = _a.sent();
+                        talentSchema.safeParse(req.body);
+                        params = this.talentsService.getParams(req.body);
                         return [4 /*yield*/, this.talentsService.create(params)];
-                    case 2:
+                    case 1:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_1 = _a.sent();
-                        if (err_1 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
-                            return [2 /*return*/, res.status(409).send({ message: err_1.message })];
+                        return [2 /*return*/, res.status(201).send({ message: 'Talent created successfully!' })];
+                    case 2:
+                        err_2 = _a.sent();
+                        if (err_2 instanceof TalentAlreadyExists_1.TalentAlreadyExists) {
+                            return [2 /*return*/, res.status(409).send({ message: err_2.message })];
                         }
-                        if (err_1 instanceof zod_1.ZodError) {
+                        if (err_2 instanceof zod_1.ZodError) {
                             return [2 /*return*/, res.status(400).json({
                                     message: 'Validation error.',
-                                    error: err_1.format()
+                                    error: err_2.format()
                                 })];
                         }
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/, res.status(201).send({ message: 'Talent created successfully!' })];
+                        return [2 /*return*/, res.status(500).send({ error: err_2.message })];
+                    case 3: return [2 /*return*/];
                 }
             });
         });

@@ -8,7 +8,7 @@
 - Typescript
 - ExpressJs
 - DynamoDB(aws)
-- Jest
+- Vitest
 - EventBridge(aws) 
 ---
 ### Features
@@ -16,7 +16,8 @@
 [x] Modele/crie a tabela(DynamoDB) para talentos.
 [x] Estruture o projeto inserindo padrões de projeto e typescript.
 [x] Endpoint POST /talents para cadastrar novos talentos.
-[ ] Endpoint GET /talents para consultar talentos com base em filtros.
+[x] Valide com Zod
+[x] Endpoint GET /talents para consultar talentos com base em filtros.
 [ ] Crie de testes unitários e integrados.
 
 ### Extra

@@ -1,5 +1,5 @@
 import { ITalentsRepository } from '../repositories/TalentsRepository';
-import { TalentAlreadyExists } from '../http/errors/TalentAlreadyExists';
+import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { v4 as uuid } from 'uuid';
 
 interface RegisterTalentParams {
@@ -21,6 +21,7 @@ interface RegisterTalentParams {
 }
 
 export interface ITalentsService {
+  index(queries);
   getParams(body): RegisterTalentParams;
   create(params): Promise<void>;
 }
@@ -28,6 +29,10 @@ export interface ITalentsService {
 export class TalentsService implements ITalentsService {
   constructor(private talentsRepository: ITalentsRepository){
     this.talentsRepository = talentsRepository;
+  }
+
+  async index(queries) {
+    return await this.talentsRepository.retrieveAll(queries);
   }
 
   getParams(body): RegisterTalentParams {

@@ -43,6 +43,16 @@ var TalentsService = /** @class */ (function () {
         this.talentsRepository = talentsRepository;
         this.talentsRepository = talentsRepository;
     }
+    TalentsService.prototype.index = function (queries) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.talentsRepository.retrieveAll(queries)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     TalentsService.prototype.getParams = function (body) {
         var position = body.position, salary = body.salary, yearsExperience = body.yearsExperience, technologies = body.technologies, region = body.region, availability = body.availability, email = body.email, name = body.name, education = body.education, languages = body.languages, contact = body.contact, occupation = body.occupation;
         return {
