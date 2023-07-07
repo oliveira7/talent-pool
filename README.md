@@ -1,5 +1,5 @@
 # Talent Poll
-#### API Rest serverless(AWS) para armazenar a entidade talentos tornando possível a cunsulta por recrutadores.
+#### API Rest serverless(AWS) para armazenar a entidade talentos tornando possível a consulta por recrutadores.
 ---
 #### Tech
 
